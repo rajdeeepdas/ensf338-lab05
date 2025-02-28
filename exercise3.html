@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab5 - Exercise 3</title>
+</head>
+<body>
+    <input type="text" id="textInput" placeholder="Enter a user number (1-30)">
+    <label id="textLabel">User information will appear here</label>
+    <button id="redButton">Red</button>
+    <button id="blueButton">Blue</button>
+    <button id="greenButton">Green</button>
+    <button id="orangeButton">Orange</button>
+    <button id="purpleButton">Purple</button>
+
+    <script>
+        const API_URL = "https://67c1fec361d8935867e50ada.mockapi.io/users_api";
+        let userDataCache = [];
+
+        async function retrieveData() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user data");
+                }
+                userDataCache = await response.json();
+                console.log("Fetched User Data:", userDataCache);
+                return userDataCache;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                return [];
+            }
+        }
+
+        async function displayUserInfo() {
+            const userId = textInput.value.trim();
+            if (userId === "" || isNaN(userId)) {
+                textLabel.textContent = "Invalid input. Please enter a number.";
+                return;
+            }
+
+            if (userDataCache.length === 0) {
+                await retrieveData();
+            }
+
+            const user = userDataCache.find(u => u.id === userId);
+            if (user) {
+                textLabel.textContent = `ID: ${user.id}, Name: ${user.first_name}, Group: ${user.user_group}`;
+                console.log("Selected User Data:", user);
+            } else {
+                textLabel.textContent = `No users were found with the provided User_ID: ${userId}.`;
+            }
+        }
+
+        textInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                displayUserInfo();
+                textInput.value = "";
+            }
+        });
+
+        function changeColor(color) {
+            textLabel.style.color = color;
+        }
+
+        document.getElementById("redButton").addEventListener("click", () => changeColor("red"));
+        document.getElementById("blueButton").addEventListener("click", () => changeColor("blue"));
+        document.getElementById("greenButton").addEventListener("click", () => changeColor("green"));
+        document.getElementById("orangeButton").addEventListener("click", () => changeColor("orange"));
+        document.getElementById("purpleButton").addEventListener("click", () => changeColor("purple"));
+    </script>
+</body>
+</html>
